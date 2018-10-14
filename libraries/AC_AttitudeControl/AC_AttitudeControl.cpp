@@ -719,7 +719,7 @@ void AC_AttitudeControl::add_log()
 }
 
 
-void AC_AttitudeControl::observer()
+void AC_AttitudeControl::observer(void)
 {
 	_e1 = -_roll + _ahrs.roll;
 	_e2 = -_pitch + _ahrs.pitch;

@@ -92,6 +92,20 @@ const AP_Param::GroupInfo AC_AttitudeControl::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("ANG_LIM_TC", 16, AC_AttitudeControl, _angle_limit_tc, AC_ATTITUDE_CONTROL_ANGLE_LIMIT_TC_DEFAULT),
 
+    // @Param: _alpha_1
+    // @DisplayName: _alpha_1
+    // @Description: _alpha_1
+    // @Range: 0.00 100
+    // @User: Advanced
+    AP_GROUPINFO("ALPHA_1", 17, AC_AttitudeControl, _alpha_1, AC_ATTITUDE_ALPHA1),
+
+    // @Param: _alpha_2
+    // @DisplayName: _alpha_2
+    // @Description: _alpha_2
+    // @Range: 0.00 100
+    // @User: Advanced
+    AP_GROUPINFO("ALPHA_2", 18, AC_AttitudeControl, _alpha_2, AC_ATTITUDE_ALPHA2),
+
     AP_GROUPEND
 };
 
@@ -635,6 +649,8 @@ float AC_AttitudeControl::rate_target_to_motor_roll(float rate_actual_rads, floa
     float output = get_rate_roll_pid().get_p() + integrator + get_rate_roll_pid().get_d() + get_rate_roll_pid().get_ff(rate_target_rads);
 
     // Constrain output
+    _troll = constrain_float(output, -1.0f, 1.0f);
+    _rate_roll = rate_actual_rads;
     return constrain_float(output, -1.0f, 1.0f);
 }
 
@@ -658,6 +674,7 @@ float AC_AttitudeControl::rate_target_to_motor_pitch(float rate_actual_rads, flo
     float output = get_rate_pitch_pid().get_p() + integrator + get_rate_pitch_pid().get_d() + get_rate_pitch_pid().get_ff(rate_target_rads);
 
     // Constrain output
+    _tpitch = constrain_float(output, -1.0f, 1.0f);
     return constrain_float(output, -1.0f, 1.0f);
 }
 
@@ -681,8 +698,47 @@ float AC_AttitudeControl::rate_target_to_motor_yaw(float rate_actual_rads, float
     float output = get_rate_yaw_pid().get_p() + integrator + get_rate_yaw_pid().get_d() + get_rate_yaw_pid().get_ff(rate_target_rads);
 
     // Constrain output
+    _rate_psi = rate_actual_rads;
     return constrain_float(output, -1.0f, 1.0f);
 }
+
+
+void AC_AttitudeControl::add_log()
+{
+	Vector3f gyro_latest = _ahrs.get_gyro_latest();
+	DataFlash_Class::instance()->Log_Write("INPUT", "TimeUS,TR,TP, DRH,RH,AR,ADR,ER", "Qfffffff",
+                                       AP_HAL::micros64(),
+                                       (double)_troll,
+                                       (double)_tpitch,
+                                       (double)_droll,
+                                       (double)_roll,
+									   (double)_ahrs.roll,
+									   (double)gyro_latest.x,
+									   (double)sgn(_e1));
+}
+
+
+void AC_AttitudeControl::observer(void)
+{
+	_e1 = -_roll + _ahrs.roll;
+	//_droll= ((0.001 * _rate_roll * _rate_psi + 100 * _troll + _alpha_2 * sgn(_e1)) + _droll_previous)*_dt;
+	_droll= ((0.001 * _rate_roll * _rate_psi +  100 *_troll + _alpha_2 * sgn(_e1)))*_dt+ _droll_previous;
+	_roll = ((_droll + _alpha_1*sqrtf(abs(_e1)) * sgn(_e1)))*_dt+ _roll_previous;
+	_droll_previous = _droll;
+	_roll_previous = _roll;
+}
+
+int AC_AttitudeControl::sgn(float p)
+{
+	if (p>0) return 1;
+	if (p<0) return -1;
+	return 0;
+}
+
+
+
+
+
 
 // Enable or disable body-frame feed forward
 void AC_AttitudeControl::accel_limiting(bool enable_limits)

@@ -39,6 +39,8 @@
 #define AC_ATTITUDE_CONTROL_MAN_DEFAULT                 0.5f    // manual throttle mix default
 #define AC_ATTITUDE_CONTROL_MAX_DEFAULT                 0.5f    // maximum throttle mix default
 #define AC_ATTITUDE_CONTROL_MAX                         5.0f    // maximum throttle mix default
+#define AC_ATTITUDE_ALPHA1                              1.0f    // maximum throttle mix default
+#define AC_ATTITUDE_ALPHA2                              1.0f    // maximum throttle mix default
 
 #define AC_ATTITUDE_CONTROL_THR_MIX_DEFAULT             0.5f  // ratio controlling the max throttle output during competing requests of low throttle from the pilot (or autopilot) and higher throttle for attitude control.  Higher favours Attitude over pilot input
 
@@ -393,6 +395,27 @@ protected:
     // update state in ControlMonitor
     void control_monitor_filter_pid(float value, float &rms_P);
     void control_monitor_update(void);
+
+
+    //recently added
+	void add_log();
+    float _troll=0;
+    float _tpitch =0;
+    float _rate_psi=0;
+    float _rate_roll=0;
+    float _droll_previous=0;
+    float _roll_previous=0;
+    float _droll=0;
+    float _roll=0;
+    float _e1=0;
+    AP_Float            _alpha_1;
+    AP_Float            _alpha_2;
+    float _error_roll=0;
+    float _actual_roll=0;
+    void observer(void);
+    int sgn(float p);
+
+
 
 public:
     // log a CTRL message

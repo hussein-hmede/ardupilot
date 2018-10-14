@@ -675,7 +675,6 @@ float AC_AttitudeControl::rate_target_to_motor_pitch(float rate_actual_rads, flo
 
     // Constrain output
     _tpitch = constrain_float(output, -1.0f, 1.0f);
-    _rate_pitch = rate_actual_rads;
     return constrain_float(output, -1.0f, 1.0f);
 }
 

@@ -423,7 +423,7 @@ protected:
     float _actual_roll=0;
     float _error_pitch=0;
     float _actual_pitch=0;
-    void observer(void);
+    void observer();
     int sgn(float p);
     LowPassFilterFloat  _throttle_filter;           // throttle input filter
 

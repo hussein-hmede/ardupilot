@@ -11,7 +11,6 @@
 #include <AP_Motors/AP_Motors.h>
 #include <AC_PID/AC_PID.h>
 #include <AC_PID/AC_P.h>
-#include <Filter/Filter.h>         // filter library
 
 #define AC_ATTITUDE_CONTROL_ANGLE_P                     4.5f             // default angle P gain for roll, pitch and yaw
 
@@ -401,31 +400,20 @@ protected:
     //recently added
 	void add_log();
     float _troll=0;
-    LowPassFilterFloat _troll_filter;
-    LowPassFilterFloat _tpitch_filter;
     float _tpitch =0;
     float _rate_psi=0;
     float _rate_roll=0;
-    float _rate_pitch=0;
     float _droll_previous=0;
     float _roll_previous=0;
     float _droll=0;
     float _roll=0;
-    float _dpitch_previous=0;
-    float _pitch_previous=0;
-    float _dpitch=0;
-    float _pitch=0;
     float _e1=0;
-    float _e2=0;
     AP_Float            _alpha_1;
     AP_Float            _alpha_2;
     float _error_roll=0;
     float _actual_roll=0;
-    float _error_pitch=0;
-    float _actual_pitch=0;
     void observer(void);
     int sgn(float p);
-    LowPassFilterFloat  _throttle_filter;           // throttle input filter
 
 
 

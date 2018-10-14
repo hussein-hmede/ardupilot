@@ -706,33 +706,45 @@ float AC_AttitudeControl::rate_target_to_motor_yaw(float rate_actual_rads, float
 void AC_AttitudeControl::add_log()
 {
 	Vector3f gyro_latest = _ahrs.get_gyro_latest();
-	DataFlash_Class::instance()->Log_Write("INPUT", "TimeUS,TR,TP, DRH,RH,AR,ADR,ER", "Qfffffff",
+	DataFlash_Class::instance()->Log_Write("INPUT", "TimeUS, DRH,RH,AR,ADR,DPH,PH,AP,ADP", "Qffffffff",
                                        AP_HAL::micros64(),
-                                       (double)_troll,
-                                       (double)_tpitch,
                                        (double)_droll,
                                        (double)_roll,
 									   (double)_ahrs.roll,
 									   (double)gyro_latest.x,
-									   (double)sgn(_e1));
+									   (double)_dpitch,
+									   (double)_pitch,
+									   (double)_ahrs.pitch,
+									   (double)gyro_latest.y);
 }
 
 
 void AC_AttitudeControl::observer(void)
 {
 	_e1 = -_roll + _ahrs.roll;
+	_e2 = -_pitch + _ahrs.pitch;
+
+
 	//_droll= ((0.001 * _rate_roll * _rate_psi + 100 * _troll + _alpha_2 * sgn(_e1)) + _droll_previous)*_dt;
-	_droll= ((0.001 * _rate_roll * _rate_psi +  100 *_troll + _alpha_2 * sgn(_e1)))*_dt+ _droll_previous;
+	_droll= ((0.001 * _rate_pitch * _rate_psi +  100 *_troll + _alpha_2 * sgn(_e1)))*_dt+ _droll_previous;
 	_roll = ((_droll + _alpha_1*sqrtf(abs(_e1)) * sgn(_e1)))*_dt+ _roll_previous;
+
+
+	//_droll= ((0.001 * _rate_roll * _rate_psi + 100 * _troll + _alpha_2 * sgn(_e1)) + _droll_previous)*_dt;
+	_dpitch= ((0.001 * _rate_roll * _rate_psi +  100 *_tpitch + _alpha_2 * sgn(_e2)))*_dt+ _dpitch_previous;
+	_pitch = ((_dpitch + _alpha_1*sqrtf(abs(_e2)) * sgn(_e2)))*_dt+ _pitch_previous;
+
 	_droll_previous = _droll;
 	_roll_previous = _roll;
+	_dpitch_previous = _dpitch;
+	_pitch_previous = _pitch;
 }
 
 int AC_AttitudeControl::sgn(float p)
 {
-	if (p>0) return 1;
-	if (p<0) return -1;
-	return 0;
+	if (p>1) return 1;
+	if (p<-1) return -1;
+	return p;
 }
 
 

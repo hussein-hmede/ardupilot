@@ -675,6 +675,7 @@ float AC_AttitudeControl::rate_target_to_motor_pitch(float rate_actual_rads, flo
 
     // Constrain output
     _tpitch = constrain_float(output, -1.0f, 1.0f);
+    _rate_pitch = rate_actual_rads;
     return constrain_float(output, -1.0f, 1.0f);
 }
 
@@ -706,7 +707,7 @@ float AC_AttitudeControl::rate_target_to_motor_yaw(float rate_actual_rads, float
 void AC_AttitudeControl::add_log()
 {
 	Vector3f gyro_latest = _ahrs.get_gyro_latest();
-	DataFlash_Class::instance()->Log_Write("INPUT", "TimeUS, DRH,RH,AR,ADR,DPH,PH,AP,ADP", "Qffffffff",
+	DataFlash_Class::instance()->Log_Write("INP", "TimeUS, DRH,RH,AR,ADR,DPH,PH,AP,ADP", "Qffffffff",
                                        AP_HAL::micros64(),
                                        (double)_droll,
                                        (double)_roll,
@@ -742,9 +743,9 @@ void AC_AttitudeControl::observer(void)
 
 int AC_AttitudeControl::sgn(float p)
 {
-	if (p>1) return 1;
-	if (p<-1) return -1;
-	return p;
+	if (p>0) return 1;
+	if (p<0) return -1;
+	return 0;
 }
 
 

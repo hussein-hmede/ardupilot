@@ -550,6 +550,14 @@ const AP_Param::GroupInfo NavEKF2::var_info[] = {
     // @RebootRequired: True
     AP_GROUPINFO("OGN_HGT_MASK", 49, NavEKF2, _originHgtMode, 0),
 
+    // @Param: fault
+    // @DisplayName: fault
+    // @Description: fault
+    // @Bitmask: 0:fault
+    // @User: Advanced
+    // @RebootRequired: True
+    AP_GROUPINFO("FAULT", 50, NavEKF2, _fault, 0),
+
     AP_GROUPEND
 };
 

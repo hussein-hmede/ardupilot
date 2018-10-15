@@ -106,6 +106,7 @@ const AP_Param::GroupInfo SITL::var_info2[] = {
     AP_GROUPINFO("GPS_LOCKTIME", 5, SITL,  gps_lock_time, 0),
     AP_GROUPINFO("ARSPD_FAIL_P", 6, SITL,  arspd_fail_pressure, 0),
     AP_GROUPINFO("ARSPD_PITOT",  7, SITL,  arspd_fail_pitot_pressure, 0),
+    AP_GROUPINFO("FAULT",  8, SITL,  fault, 0),
     AP_GROUPEND
 };
     
@@ -207,6 +208,11 @@ Vector3f SITL::convert_earth_frame(const Matrix3f &dcm, const Vector3f &gyro)
     }
     float psiDot = (q*sinf(phi) + r*cosf(phi))/cosf(theta);
     return Vector3f(phiDot, thetaDot, psiDot);
+}
+
+int SITL::get_fault()
+{
+return fault;
 }
 
 } // namespace SITL

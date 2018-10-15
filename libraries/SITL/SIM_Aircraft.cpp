@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
-
+#include "SITL.h"
 
 #ifdef __CYGWIN__
 #include <windows.h>
@@ -426,6 +426,19 @@ void Aircraft::update_dynamics(const Vector3f &rot_accel)
     gyro.x = constrain_float(gyro.x, -radians(2000.0f), radians(2000.0f));
     gyro.y = constrain_float(gyro.y, -radians(2000.0f), radians(2000.0f));
     gyro.z = constrain_float(gyro.z, -radians(2000.0f), radians(2000.0f));
+
+
+    if(sitl->get_fault() == 1 && f==false) {
+    	t1=AP_HAL::micros64();
+    	t2 = AP_HAL::micros64();
+    	f=true;
+    }
+    if(t1>=t2 && t1<=t2 + 5000000 && f==true)
+    {
+    	gyro.x +=0.1;
+    	t1 = AP_HAL::micros64();
+    }
+
 
     // estimate angular acceleration using a first order difference calculation
     // TODO the simulator interface should provide the angular acceleration

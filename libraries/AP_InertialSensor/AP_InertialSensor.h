@@ -330,6 +330,9 @@ private:
     // product id
     AP_Int16 _old_product_id;
 
+    //recently added
+    AP_Int16 _Fault;
+
     // IDs to uniquely identify each sensor: shall remain
     // the same across reboots
     AP_Int32 _accel_id[INS_MAX_INSTANCES];

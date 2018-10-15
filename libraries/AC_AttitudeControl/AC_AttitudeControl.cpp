@@ -707,7 +707,7 @@ float AC_AttitudeControl::rate_target_to_motor_yaw(float rate_actual_rads, float
 void AC_AttitudeControl::add_log()
 {
 	Vector3f gyro_latest = _ahrs.get_gyro_latest();
-	DataFlash_Class::instance()->Log_Write("INP", "TimeUS, DRH,RH,AR,ADR,DPH,PH,AP,ADP", "Qffffffff",
+	DataFlash_Class::instance()->Log_Write("INP", "TimeUS, DRH,RH,AR,ADR,DPH,PH,AP,ADP,RR,RP", "Qffffffffff",
                                        AP_HAL::micros64(),
                                        (double)_droll,
                                        (double)_roll,
@@ -716,7 +716,9 @@ void AC_AttitudeControl::add_log()
 									   (double)_dpitch,
 									   (double)_pitch,
 									   (double)_ahrs.pitch,
-									   (double)gyro_latest.y);
+									   (double)gyro_latest.y,
+									   (double)_res_roll,
+									   (double)_res_pitch);
 }
 
 
@@ -727,25 +729,27 @@ void AC_AttitudeControl::observer(void)
 
 
 	//_droll= ((0.001 * _rate_roll * _rate_psi + 100 * _troll + _alpha_2 * sgn(_e1)) + _droll_previous)*_dt;
-	_droll= ((0.001 * _rate_pitch * _rate_psi +  100 *_troll + _alpha_2 * sgn(_e1)))*_dt+ _droll_previous;
+	_droll= ((0.001 * _dpitch_previous * _rate_psi +  50* _troll + _alpha_2 * sgn(_e1)))*_dt+ _droll_previous;
 	_roll = ((_droll + _alpha_1*sqrtf(abs(_e1)) * sgn(_e1)))*_dt+ _roll_previous;
 
 
 	//_droll= ((0.001 * _rate_roll * _rate_psi + 100 * _troll + _alpha_2 * sgn(_e1)) + _droll_previous)*_dt;
-	_dpitch= ((0.001 * _rate_roll * _rate_psi +  100 *_tpitch + _alpha_2 * sgn(_e2)))*_dt+ _dpitch_previous;
+	_dpitch= ((0.001 * _droll_previous * _rate_psi +  50 *_tpitch + _alpha_2 * sgn(_e2)))*_dt+ _dpitch_previous;
 	_pitch = ((_dpitch + _alpha_1*sqrtf(abs(_e2)) * sgn(_e2)))*_dt+ _pitch_previous;
 
 	_droll_previous = _droll;
 	_roll_previous = _roll;
 	_dpitch_previous = _dpitch;
 	_pitch_previous = _pitch;
+	_res_roll = _e1;
+	_res_pitch = _e2;
 }
 
-int AC_AttitudeControl::sgn(float p)
+float AC_AttitudeControl::sgn(float p)
 {
-	if (p>0) return 1;
-	if (p<0) return -1;
-	return 0;
+	if (p>1) return 1;
+	if (p<-1) return -1;
+	return p;
 }
 
 

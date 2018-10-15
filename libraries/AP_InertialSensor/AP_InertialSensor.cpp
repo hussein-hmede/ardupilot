@@ -428,6 +428,12 @@ const AP_Param::GroupInfo AP_InertialSensor::var_info[] = {
     // @Description: Gyro notch filter
     // @User: Advanced
     AP_SUBGROUPINFO(_notch_filter, "NOTCH_",  37, AP_InertialSensor, NotchFilterVector3fParam),
+
+    // @Param: _Fault
+    // @DisplayName: Fast sampling mask
+    // @Description: Mask of IMUs to enable fast sampling on, if available
+    // @User: Advanced
+    AP_GROUPINFO("_Fault",  38, AP_InertialSensor, _Fault,   0),
     
     /*
       NOTE: parameter indexes have gaps above. When adding new
@@ -1280,6 +1286,13 @@ void AP_InertialSensor::update(void)
     _last_update_usec = AP_HAL::micros();
     
     _have_sample = false;
+
+    if(_Fault==1)
+    {
+    	 for (uint8_t i=0; i<INS_MAX_INSTANCES; i++) {
+    			_gyro[i].x = _gyro[i].x + 1;
+    	 }
+    }
 }
 
 /*

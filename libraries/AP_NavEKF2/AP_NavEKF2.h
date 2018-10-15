@@ -319,6 +319,8 @@ public:
     // get timing statistics structure
     void getTimingStatistics(int8_t instance, struct ekf_timing &timing);
     
+    void getfault();
+
 private:
     uint8_t num_cores; // number of allocated cores
     uint8_t primary;   // current primary core
@@ -380,6 +382,8 @@ private:
     AP_Float _useRngSwSpd;          // Maximum horizontal ground speed to use range finder as the primary height source (m/s)
     AP_Int8 _magMask;               // Bitmask forcng specific EKF core instances to use simple heading magnetometer fusion.
     AP_Int8 _originHgtMode;         // Bitmask controlling post alignment correction and reporting of the EKF origin height.
+
+    AP_Int8 _fault;         // Bitmask controlling post alignment correction and reporting of the EKF origin height.
 
     // Tuning parameters
     const float gpsNEVelVarAccScale;    // Scale factor applied to NE velocity measurement variance due to manoeuvre acceleration
